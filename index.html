@@ -1,221 +1,1313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>setup</title>
-
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
-<style>
-/* ---------- THEME VARIABLES ---------- */
-:root {
-    --bg: #0a0a0a;
-    --card: #141414;
-    --text: #d6d6d6;
-    --muted: #8c8c8c;
-    --accent: #00f5c8;
-}
-
-body.light {
-    --bg: #f2f2f2;
-    --card: #ffffff;
-    --text: #1a1a1a;
-    --muted: #6f6f6f;
-    --accent: #00a88b;
-}
-
-/* ---------- BASE ---------- */
-* {
-    box-sizing: border-box;
-}
-
-html, body {
-    transition: background .35s ease, color .35s ease;
-}
-
-body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: "JetBrains Mono", monospace;
-}
-
-/* ---------- LAYOUT ---------- */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px 16px 70px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-}
-
-@media (min-width: 900px) {
-    .grid {
-        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>thwak:system/loadout</title>
+  <style>
+    :root {
+      /* Темная тема (по умолчанию) с розовым акцентным цветом */
+      --bg: #0a0a0a;
+      --panel: #121212;
+      --border: #1f1f1f;
+      --text: #cfcfcf;
+      --muted: #7a7a7a;
+      --accent: #ff9ce6; /* Розовый вместо зеленого */
+      --accent-dim: #b36fa6;
+      --accent-transparent: rgba(255, 156, 230, 0.08);
+      --accent-hover: rgba(255, 156, 230, 0.06);
+      --ascii-color: #ffffff;
     }
-}
 
-/* ---------- CARDS ---------- */
-.card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.15)), var(--card);
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.25);
-    transition: background .35s ease, box-shadow .35s ease;
-}
+    :root.light-theme {
+      /* Светлая тема с синим акцентным цветом */
+      --bg: #f5f5f5;
+      --panel: #ffffff;
+      --border: #e0e0e0;
+      --text: #333333;
+      --muted: #666666;
+      --accent: #007acc;
+      --accent-dim: #005a9c;
+      --accent-transparent: rgba(0, 122, 204, 0.08);
+      --accent-hover: rgba(0, 122, 204, 0.06);
+      --ascii-color: #000000;
+    }
 
-.card h2 {
-    margin: 0 0 18px;
-    font-size: 26px;
-    font-weight: 600;
-    color: var(--accent);
-    transition: color .35s ease;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
+    }
 
-/* ---------- ITEMS ---------- */
-.item {
-    margin-bottom: 14px;
-}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-.item:last-child {
-    margin-bottom: 0;
-}
+    .wrap {
+      width: 100%;
+      max-width: 1400px;
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 1fr;
+    }
 
-.label {
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    transition: color .35s ease;
-}
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 6px var(--accent);
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+        box-shadow: 0 0 12px var(--accent);
+      }
+    }
 
-.value {
-    font-size: 15px;
-    line-height: 1.4;
-}
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-/* ---------- FOOTER ---------- */
-.footer {
-    margin-top: 40px;
-    text-align: center;
-    font-size: 14px;
-    color: var(--muted);
-}
+    .smooth-scroll {
+      scroll-behavior: smooth;
+    }
 
-.footer a {
-    color: var(--text);
-    text-decoration: none;
-    margin: 0 6px;
-    transition: color .25s ease;
-}
+    /* Мобильная версия */
+    @media (max-width: 767px) {
+      body {
+        padding: 12px;
+      }
+      
+      .wrap {
+        gap: 12px;
+      }
+      
+      header {
+        padding: 12px 14px;
+      }
+      
+      .section-title {
+        padding: 8px 12px;
+        font-size: 11px;
+      }
+      
+      li {
+        padding: 6px 12px;
+        font-size: 12px;
+        grid-template-columns: 12px 1fr auto;
+      }
+      
+      footer {
+        padding: 10px;
+        font-size: 12px;
+      }
+      
+      .terminal {
+        font-size: 12px;
+      }
+      
+      .ascii-art {
+        font-size: 8px;
+        line-height: 0.9;
+      }
+      
+      .neofetch-info {
+        font-size: 11px;
+      }
+    }
 
-.footer a:hover {
-    color: var(--accent);
-}
+    /* Планшетная версия */
+    @media (min-width: 768px) and (max-width: 1199px) {
+      .wrap {
+        grid-template-columns: 1fr;
+        max-width: 800px;
+      }
+      
+      .hardware-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      
+      .hardware-grid .section {
+        margin-bottom: 0;
+      }
+    }
 
-/* ---------- THEME SWITCH ---------- */
-.theme-toggle {
-    position: fixed;
-    top: 18px;
-    right: 18px;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: var(--card);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 8px 20px rgba(0,0,0,.25);
-    transition: background .35s ease, transform .2s ease;
-    z-index: 10;
-}
+    /* Десктопная версия */
+    @media (min-width: 1200px) {
+      .wrap {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto auto auto;
+        grid-template-areas: 
+          "header header"
+          "terminal hardware"
+          "footer footer";
+        gap: 24px;
+      }
+      
+      header {
+        grid-area: header;
+      }
+      
+      #terminal-section {
+        grid-area: terminal;
+        margin-bottom: 0;
+      }
+      
+      .hardware-grid {
+        grid-area: hardware;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        height: fit-content;
+        align-self: start;
+      }
+      
+      footer {
+        grid-area: footer;
+      }
+    }
 
-.theme-toggle:hover {
-    transform: scale(1.05);
-}
+    header {
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--accent);
+      background: var(--panel);
+      transition: all 0.3s ease;
+    }
 
-.theme-toggle span {
-    font-size: 20px;
-    transition: transform .35s ease;
-}
-</style>
+    .section {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      margin-bottom: 0;
+    }
+
+    #terminal-section {
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-title {
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.12em;
+      background: linear-gradient(90deg, var(--accent-transparent), transparent);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .section-title::before {
+      content: "$ ";
+      color: var(--accent-dim);
+      transition: color 0.3s ease;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    li {
+      padding: 10px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 16px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    li::before {
+      content: ">";
+      color: var(--accent-dim);
+      transition: color 0.3s ease;
+    }
+
+    li:hover {
+      background: var(--accent-hover);
+      box-shadow: inset 2px 0 0 var(--accent);
+    }
+
+    .label {
+      color: var(--muted);
+      white-space: nowrap;
+      transition: color 0.3s ease;
+    }
+
+    .value {
+      text-align: right;
+    }
+
+    footer {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      transition: all 0.3s ease;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.3s ease;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--accent);
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* Terminal styles */
+    .terminal {
+      font-size: 13px;
+    }
+
+    .terminal .line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .prompt {
+      color: var(--accent);
+      transition: color 0.3s ease;
+    }
+
+    #cmd {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      width: 100%;
+      transition: color 0.3s ease;
+      caret-color: var(--accent);
+      padding: 0;
+      margin: 0;
+    }
+
+    #cmd::placeholder {
+      color: var(--muted);
+      transition: color 0.3s ease;
+      opacity: 1;
+    }
+
+    .terminal-output {
+      padding: 16px 18px;
+      font-size: 13px;
+      display: grid;
+      gap: 8px;
+      flex: 1;
+      overflow-y: auto;
+      max-height: none;
+      min-height: 0;
+    }
+
+    /* Курсор для командной строки */
+    .terminal-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: var(--accent);
+      vertical-align: middle;
+      margin-left: 4px;
+      animation: terminal-blink 1s steps(2, start) infinite;
+    }
+
+    @keyframes terminal-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Анимация печатания текста */
+    .typing-line {
+      display: flex;
+      align-items: center;
+      min-height: 20px;
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 17px;
+      background: var(--accent);
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: typing-blink 1.2s steps(2, start) infinite;
+    }
+
+    @keyframes typing-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Стили для ASCII арта */
+    .ascii-art-container {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 30px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    @media (max-width: 767px) {
+      .ascii-art-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .ascii-art-wrapper {
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .ascii-art-container {
+        gap: 40px;
+      }
+    }
+
+    .ascii-art {
+      font-family: "Courier New", monospace;
+      font-size: 10px;
+      line-height: 1.0;
+      color: var(--ascii-color);
+      white-space: pre;
+      margin: 0;
+      transition: color 0.3s ease;
+      filter: brightness(0.95);
+      letter-spacing: -0.3px;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 1200px) {
+      .ascii-art {
+        font-size: 11px;
+        flex: 1;
+      }
+    }
+
+    .neofetch-info {
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.3;
+      color: var(--text);
+      flex: 1;
+      min-width: 300px;
+      animation: fadeInUp 0.5s ease-out 0.3s both;
+    }
+
+    @media (max-width: 767px) {
+      .neofetch-info {
+        min-width: 100%;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .neofetch-info {
+        flex: 1;
+        margin-left: 30px;
+      }
+    }
+
+    .neofetch-header {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 2px;
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    .neofetch-header-label {
+      color: var(--accent);
+      font-weight: bold;
+      margin-right: 8px;
+      font-size: 13px;
+    }
+
+    .neofetch-header-value {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .neofetch-separator {
+      color: var(--muted);
+      margin: 2px 0 8px 0;
+      letter-spacing: 1px;
+      opacity: 0.8;
+      animation: fadeInUp 0.3s ease-out 0.1s both;
+    }
+
+    .neofetch-line {
+      margin-bottom: 1px;
+      display: flex;
+      align-items: baseline;
+      flex-wrap: nowrap;
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    .neofetch-label {
+      color: var(--accent);
+      font-weight: bold;
+      min-width: 110px;
+      flex-shrink: 0;
+    }
+
+    .neofetch-value {
+      color: var(--text);
+      margin-left: 10px;
+      flex-grow: 1;
+      text-align: left;
+    }
+
+    /* Улучшенные стили для команд и вывода */
+    .command-echo {
+      margin: 4px 0;
+      color: var(--accent);
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    .command-output {
+      animation: fadeInUp 0.3s ease-out;
+      margin-bottom: 8px;
+    }
+
+    .welcome-message {
+      margin-top: 12px;
+      color: var(--text);
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .welcome-message .hash {
+      color: var(--accent);
+    }
+
+    .welcome-message .command {
+      color: var(--accent);
+    }
+
+    /* Стили для цветных иконок */
+    .color-square {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      margin-right: 8px;
+      vertical-align: middle;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .color-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0;
+      padding: 2px 0;
+    }
+
+    .color-name {
+      display: flex;
+      align-items: center;
+    }
+
+    .color-message {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <header>
+      <div class="terminal">
+        <div class="line">
+          <span class="prompt">$</span>
+          <span id="typing-header">thwak:system/loadout</span>
+          <span class="terminal-cursor"></span>
+        </div>
+        <div class="line">
+          <span class="prompt">$</span>
+          <input id="cmd" type="text" placeholder="type !help for commands (Tab to autocomplete)" autocomplete="off">
+        </div>
+      </div>
+    </header>
 
-<!-- THEME BUTTON -->
-<div class="theme-toggle" id="themeToggle">
-    <span id="themeIcon">🌙</span>
-</div>
-
-<div class="container">
-<div class="grid">
-
-    <!-- MAIN PC -->
-    <div class="card">
-        <h2>Main PC</h2>
-
-        <div class="item"><div class="label">CPU</div><div class="value">AMD Ryzen 7 7700X</div></div>
-        <div class="item"><div class="label">Motherboard</div><div class="value">ASUS TUF Gaming A620M-PLUS [T_T]</div></div>
-        <div class="item"><div class="label">GPU</div><div class="value">NVIDIA GeForce RTX 4070 SUPER</div></div>
-        <div class="item"><div class="label">RAM</div><div class="value">32Gb DDR5 Corsair Vengeance 6000MHz CL30</div></div>
-        <div class="item"><div class="label">SSD</div><div class="value">Samsung 990 Pro 1Tb</div></div>
-        <div class="item"><div class="label">PSU</div><div class="value">NZXT C750 Bronze</div></div>
+    <div id="terminal-section" class="section">
+      <div class="section-title">TERMINAL</div>
+      <div id="terminal-output" class="terminal-output smooth-scroll">
+        <!-- ASCII арт и neofetch информация будут добавлены сюда через JS -->
+      </div>
     </div>
 
-    <!-- SETUP -->
-    <div class="card">
-        <h2>Setup</h2>
+    <div class="hardware-grid">
+      <div class="section">
+        <div class="section-title">PC — system status</div>
+        <ul>
+          <li><span class="label">CPU</span><span class="value">AMD Ryzen 7 7700X</span></li>
+          <li><span class="label">BOARD</span><span class="value">ASUS TUF A620M‑PLUS</span></li>
+          <li><span class="label">GPU</span><span class="value">RTX 4070 SUPER</span></li>
+          <li><span class="label">RAM</span><span class="value">32GB DDR5 6000 CL30</span></li>
+          <li><span class="label">SSD</span><span class="value">Samsung 990 Pro 1TB</span></li>
+          <li><span class="label">PSU</span><span class="value">NZXT C750 Bronze</span></li>
+        </ul>
+      </div>
 
-        <div class="item"><div class="label">Monitor #1</div><div class="value">TCL 25G64</div></div>
-        <div class="item"><div class="label">Monitor #2</div><div class="value">ASUS 75Hz ???</div></div>
-        <div class="item"><div class="label">Keyboard</div><div class="value">Wooting 60HE [not modded]</div></div>
-        <div class="item"><div class="label">Mouse #1</div><div class="value">G-Wolves Fenrir Max</div></div>
-        <div class="item"><div class="label">Mousepad</div><div class="value">Wallhack SP-004 White</div></div>
-        <div class="item"><div class="label">Mouse #2</div><div class="value">Hitscan Hyperlight</div></div>
-        <div class="item"><div class="label">Headphones</div><div class="value">FiiO JT1 [main]</div></div>
-        <div class="item"><div class="label">IEM</div><div class="value">7HZ x Crinacle Zero:2</div></div>
-        <div class="item"><div class="label">DAC + AMP</div><div class="value">TRN Black Pearl</div></div>
+      <div class="section">
+        <div class="section-title">PERIPHERALS — aiming / input</div>
+        <ul>
+          <li><span class="label">MONITOR #1</span><span class="value">TCL 25G64</span></li>
+          <li><span class="label">MONITOR #2</span><span class="value">ASUS 75HZ</span></li>
+          <li><span class="label">KEYBOARD</span><span class="value">Wooting 60HE</span></li>
+          <li><span class="label">MOUSE #1</span><span class="value">G‑Wolves Fenrir Max</span></li>
+          <li><span class="label">MOUSE #2</span><span class="value">Hitscan Hyperlight</span></li>
+          <li><span class="label">MOUSEPAD</span><span class="value">Wallhack SP‑004 White</span></li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-title">AUDIO — music / output</div>
+        <ul>
+          <li><span class="label">HEADPHONES</span><span class="value">FiiO JT1</span></li>
+          <li><span class="label">IEM</span><span class="value">7HZ x Crinacle Zero:2</span></li>
+          <li><span class="label">DAC / AMP</span><span class="value">TRN Black Pearl</span></li>
+        </ul>
+      </div>
     </div>
 
-</div>
+    <footer>
+      <div>
+        <a href="https://t.me/thwakk" target="_blank" rel="noopener">telegram</a> /
+        <a href="https://steamcommunity.com/id/wrldhated/" target="_blank" rel="noopener">steam</a>
+      </div>
+      <div class="status">
+        <span class="dot"></span>
+        <span class="status-text">online</span>
+      </div>
+    </footer>
+  </div>
 
-<div class="footer">
-    <a href="https://t.me/thwakk" target="_blank">telegram</a> /
-    <a href="https://steamcommunity.com/id/wrldhated/" target="_blank">steam</a>
-</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('cmd');
+      const output = document.getElementById('terminal-output');
+      const body = document.body;
+      const typingHeader = document.getElementById('typing-header');
+      
+      // ASCII арт из референса
+      const asciiArt = `                  ,-'\\
+                  _,"'    j
+           __....+       /               .
+       ,-'"             /               ; \`-._.'.
+      /                (              ,'       .'
+     |            _.    \\             \\   ---._ \`-.
+     ,|    ,   _.'  Y    \\             \`- ,'   \\   \`.\`
+     l'    \\ ,'._,\\ \`.    .              /       ,--. l
+  .,-        \`._  |  |    |              \\       _   l .
+ /              \`"--'    /              .'       \`\`. |  )
+.\\    ,                 |                .        \\ \`. '
+\`\`.                .     |                '._  __   ;. \\'
+  \`-..--------...'       \\                  \`'  \`-"\'.  \\
+      \`......___          \`._                        |  \\
+               /\`            \`..                     |   .
+              /|                \`-.                  |    L
+             / |               \\   \`._               .    |
+           ,'  |,-\"-.   .       .     \`.            /     |
+         ,'    |     '   \\      |       \`.         /      |
+       ,'     /|       \\  .     |         .       /       |
+     ,'      / |        \\  .    +          \\    ,'       .'
+    .       .  |         \\ |     \\          \\_,'        / j
+    |       |  L          \`|      .          \`        ,' '
+    |    _. |   \\          /      |           .     .' ,'
+    |   /  \`|    \\        .       |  /        |   ,' .'
+    |   ,-..\\     -.     ,        | /         |,.' ,'
+    \`. |___,\`    /  \`.   /\`.       '          |  .'
+      '-\`-'     j     \` /."7-..../|          ,\`-'
+                |        .'  / _/_|          .
+                \`,       \`"'/"'    \\          \`.
+                  \`,       '.       \`.         |
+             __,.-'         \`.        \\'       |
+            /_,-'\\          ,'        |        _.
+             |___.---.   ,-'        .-':,-\"\`\\,' .
+                  L,.--"'           '-' |  ,' \`-.\\
+                                        \`.' mh`.trim();
 
-</div>
+      // Упрощенный ASCII арт для мобильных устройств
+      const mobileAsciiArt = `        ,-'\\
+      _,"'  j
+ __....+   /
+,-'"       /
+/         (
+|    _.   \\
+,|  _.' Y \\
+l' ,'._,\\ \`.
+.,- \`._ | |
+/   \`"--'
+.\\    ,
+\`\`.   .
+  \`-..'
+      \`......___`.trim();
 
-<script>
-const toggle = document.getElementById("themeToggle");
-const icon = document.getElementById("themeIcon");
+      // Определяем размер экрана для выбора ASCII арта
+      function getAsciiArt() {
+        return window.innerWidth < 768 ? mobileAsciiArt : asciiArt;
+      }
 
-function setTheme(theme) {
-    if (theme === "light") {
-        document.body.classList.add("light");
-        icon.textContent = "☀︎";
-    } else {
-        document.body.classList.remove("light");
-        icon.textContent = "⏾";
-    }
-    localStorage.setItem("theme", theme);
-}
+      // Функция плавной прокрутки терминала вниз
+      function smoothScrollToBottom() {
+        output.scrollTo({
+          top: output.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
 
-toggle.addEventListener("click", () => {
-    const isLight = document.body.classList.contains("light");
-    setTheme(isLight ? "dark" : "light");
-});
+      // Автоматическая прокрутка при добавлении нового контента
+      function autoScrollToBottom() {
+        setTimeout(() => {
+          smoothScrollToBottom();
+        }, 50);
+      }
 
-const savedTheme = localStorage.getItem("theme") || "dark";
-setTheme(savedTheme);
-</script>
+      // Анимация печатания заголовка при загрузке
+      async function typeHeader() {
+        const headerText = "thwak:system/loadout";
+        typingHeader.textContent = "";
+        
+        const cursor = document.createElement('span');
+        cursor.className = 'typing-cursor';
+        typingHeader.appendChild(cursor);
+        
+        for (let i = 0; i < headerText.length; i++) {
+          cursor.remove();
+          typingHeader.textContent += headerText[i];
+          typingHeader.appendChild(cursor);
+          await new Promise(resolve => setTimeout(resolve, 30 + Math.random() * 90));
+        }
+        cursor.remove();
+      }
+      
+      // Функция для отображения ASCII арта и neofetch информации
+      function displayStartupArt() {
+        // Создаем контейнер для арта и информации
+        const artContainer = document.createElement('div');
+        artContainer.className = 'ascii-art-container';
+        
+        // Создаем враппер для ASCII арта
+        const artWrapper = document.createElement('div');
+        artWrapper.className = 'ascii-art-wrapper';
+        
+        // Создаем элемент для ASCII арта
+        const artElement = document.createElement('pre');
+        artElement.className = 'ascii-art';
+        artElement.textContent = getAsciiArt();
+        
+        // Добавляем арт во враппер
+        artWrapper.appendChild(artElement);
+        
+        // Создаем элемент для neofetch информации
+        const infoElement = document.createElement('div');
+        infoElement.className = 'neofetch-info';
+        
+        // Заголовок thwak: @system
+        const headerLine = document.createElement('div');
+        headerLine.className = 'neofetch-header';
+        headerLine.innerHTML = `
+          <span class="neofetch-header-label">thwak:</span>
+          <span class="neofetch-header-value">@system</span>
+        `;
+        infoElement.appendChild(headerLine);
+        
+        // Разделитель
+        const separator1 = document.createElement('div');
+        separator1.className = 'neofetch-separator';
+        separator1.textContent = '- - - - - - - - - -';
+        infoElement.appendChild(separator1);
+        
+        // Системная информация как в исходных данных
+        const systemInfo = [
+          { label: "OS", value: "Arch Linux x86_64" },
+          { label: "Host", value: "thwak-pc" },
+          { label: "Kernel", value: "6.8.9-arch1-1" },
+          { label: "Uptime", value: "14 hours, 37 mins" },
+          { label: "Packages", value: "1274 (pacman)" },
+          { label: "Shell", value: "zsh 5.9" },
+          { label: "Resolution", value: "1920x1080 @ 240Hz" },
+          { label: "WM", value: "i3-gaps" },
+          { label: "Terminal", value: "st" },
+          { label: "CPU", value: "AMD Ryzen 7 7700X (16) @ 5.4GHz" },
+          { label: "GPU", value: "NVIDIA GeForce RTX 4070 SUPER" },
+          { label: "Memory", value: "8.2GiB / 31.2GiB" }
+        ];
+        
+        systemInfo.forEach((item, index) => {
+          const lineElement = document.createElement('div');
+          lineElement.className = 'neofetch-line';
+          lineElement.style.animationDelay = `${index * 0.03}s`;
+          lineElement.innerHTML = `
+            <span class="neofetch-label">${item.label}:</span>
+            <span class="neofetch-value">${item.value}</span>
+          `;
+          infoElement.appendChild(lineElement);
+        });
+        
+        // Второй разделитель
+        const separator2 = document.createElement('div');
+        separator2.className = 'neofetch-separator';
+        separator2.textContent = '- - - - - - - -';
+        infoElement.appendChild(separator2);
+        
+        // Основная игра и чувствительность
+        const mainInfo = [
+          { label: "Main", value: "OW2 DPS" },
+          { label: "Sens", value: "1600DPI @ 34-41cm" }
+        ];
+        
+        mainInfo.forEach((item, index) => {
+          const lineElement = document.createElement('div');
+          lineElement.className = 'neofetch-line';
+          lineElement.style.animationDelay = `${(systemInfo.length + index) * 0.03}s`;
+          lineElement.innerHTML = `
+            <span class="neofetch-label">${item.label}:</span>
+            <span class="neofetch-value">${item.value}</span>
+          `;
+          infoElement.appendChild(lineElement);
+        });
+        
+        // Добавляем арт и информацию в контейнер
+        artContainer.appendChild(artWrapper);
+        artContainer.appendChild(infoElement);
+        
+        // Добавляем контейнер в терминал
+        output.appendChild(artContainer);
+        
+        // Добавляем приветственное сообщение
+        const welcomeMessage = document.createElement('div');
+        welcomeMessage.className = 'welcome-message';
+        welcomeMessage.innerHTML = '<span class="hash">#</span> System initialized. Type <span class="command">!help</span> for available commands.';
+        output.appendChild(welcomeMessage);
+        
+        // Плавная прокрутка вниз
+        setTimeout(autoScrollToBottom, 100);
+      }
+      
+      // Массив пастельных цветовых схем - розовый теперь первый
+      const colorSchemes = [
+        {
+          name: 'Pink',
+          accent: '#ff9ce6',
+          accentDim: '#b36fa6',
+          accentTransparent: 'rgba(255, 156, 230, 0.08)',
+          accentHover: 'rgba(255, 156, 230, 0.06)'
+        },
+        {
+          name: 'Green',
+          accent: '#9cff57',
+          accentDim: '#5c8f32',
+          accentTransparent: 'rgba(156, 255, 87, 0.08)',
+          accentHover: 'rgba(156, 255, 87, 0.06)'
+        },
+        {
+          name: 'Cyan',
+          accent: '#57fff7',
+          accentDim: '#32b3ae',
+          accentTransparent: 'rgba(87, 255, 247, 0.08)',
+          accentHover: 'rgba(87, 255, 247, 0.06)'
+        },
+        {
+          name: 'Blue',
+          accent: '#57c7ff',
+          accentDim: '#328fb3',
+          accentTransparent: 'rgba(87, 199, 255, 0.08)',
+          accentHover: 'rgba(87, 199, 255, 0.06)'
+        },
+        {
+          name: 'Purple',
+          accent: '#b457ff',
+          accentDim: '#7a32b3',
+          accentTransparent: 'rgba(180, 87, 255, 0.08)',
+          accentHover: 'rgba(180, 87, 255, 0.06)'
+        },
+        {
+          name: 'Orange',
+          accent: '#ffa857',
+          accentDim: '#b37532',
+          accentTransparent: 'rgba(255, 168, 87, 0.08)',
+          accentHover: 'rgba(255, 168, 87, 0.06)'
+        },
+        {
+          name: 'Red',
+          accent: '#ff5757',
+          accentDim: '#b33232',
+          accentTransparent: 'rgba(255, 87, 87, 0.08)',
+          accentHover: 'rgba(255, 87, 87, 0.06)'
+        },
+        {
+          name: 'Yellow',
+          accent: '#fff757',
+          accentDim: '#b3ae32',
+          accentTransparent: 'rgba(255, 247, 87, 0.08)',
+          accentHover: 'rgba(255, 247, 87, 0.06)'
+        }
+      ];
+      
+      // Начинаем с розового цвета (индекс 0)
+      let currentColorIndex = 0;
 
+      // Сохраняем текущий цвет в localStorage
+      function saveCurrentColor() {
+        localStorage.setItem('thwakk-color-index', currentColorIndex.toString());
+      }
+
+      // Загружаем сохраненный цвет из localStorage
+      function loadSavedColor() {
+        const savedColor = localStorage.getItem('thwakk-color-index');
+        if (savedColor !== null) {
+          const index = parseInt(savedColor, 10);
+          if (index >= 0 && index < colorSchemes.length) {
+            currentColorIndex = index;
+            applyColorScheme(colorSchemes[currentColorIndex]);
+          }
+        }
+      }
+
+      // Применяем цветовую схему
+      function applyColorScheme(colorScheme) {
+        document.documentElement.style.setProperty('--accent', colorScheme.accent);
+        document.documentElement.style.setProperty('--accent-dim', colorScheme.accentDim);
+        document.documentElement.style.setProperty('--accent-transparent', colorScheme.accentTransparent);
+        document.documentElement.style.setProperty('--accent-hover', colorScheme.accentHover);
+        
+        // Обновляем анимацию кружка
+        const dot = document.querySelector('.dot');
+        if (dot) {
+          dot.style.background = colorScheme.accent;
+          dot.style.boxShadow = `0 0 6px ${colorScheme.accent}`;
+        }
+      }
+
+      const commands = {
+        '!help': [
+          '!help - show all commands',
+          '!age - thwakk\'s age',
+          '!height - thwakk\'s height',
+          '!timezone - current timezone',
+          '!maingame - main games',
+          '!whoami - who are you',
+          '!status - steam status',
+          '!changecolor - change accent color',
+          '!colors - show available colors',
+          '!clear - clear terminal output',
+          '!konami - ???',
+          '!theme dark/light - switch between dark/light mode'
+        ],
+        '!age': ['thwakk is 16 y.o.'],
+        '!height': ["thwakk's height is 181 cm / 5'11 ft"],
+        '!timezone': ['UTC+06'],
+        '!maingame': ['overwatch 2 / aimbeast'],
+        '!whoami': ['retard'],
+        '!status': ['steam status not connected'],
+        '!changecolor': ['Changing accent color...'],
+        '!colors': ['Available colors:'],
+        '!clear': ['Terminal cleared.'],
+        '!konami': ['Konami code sequence: ↑↑↓↓←→←→BA', 'Tap the background for... something??'],
+        '!theme': ['Usage: !theme dark or !theme light']
+      };
+
+      // Переменные для отслеживания кода Konami
+      let konamiSequence = [];
+      const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+      const konamiSymbols = ['↑', '↑', '↓', '↓', '←', '→', '←', '→', 'B', 'A'];
+      
+      // Функция анимации печатания текста
+      async function typeLines(lines) {
+        for (const text of lines) {
+          const line = document.createElement('div');
+          line.className = 'command-output';
+          output.appendChild(line);
+          
+          // Создаем курсор для этой строки
+          const cursor = document.createElement('span');
+          cursor.className = 'typing-cursor';
+          line.appendChild(cursor);
+          
+          // Печатаем текст посимвольно
+          for (let i = 0; i < text.length; i++) {
+            cursor.remove();
+            line.textContent += text[i];
+            line.appendChild(cursor);
+            await new Promise(resolve => setTimeout(resolve, 12 + Math.random() * 8));
+          }
+          
+          cursor.remove();
+          await new Promise(resolve => setTimeout(resolve, 60));
+          
+          // Автоматическая прокрутка после каждой строки
+          autoScrollToBottom();
+        }
+      }
+
+      function addCommandEcho(command) {
+        const echo = document.createElement('div');
+        echo.className = 'command-echo';
+        echo.innerHTML = `<span style="color:var(--accent)">$</span> ${command}`;
+        output.appendChild(echo);
+        autoScrollToBottom();
+      }
+
+      function changeAccentColor() {
+        currentColorIndex = (currentColorIndex + 1) % colorSchemes.length;
+        const colorScheme = colorSchemes[currentColorIndex];
+        
+        applyColorScheme(colorScheme);
+        saveCurrentColor();
+        
+        return colorScheme;
+      }
+
+      async function showColorChangeMessage(colorScheme) {
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'command-output color-message';
+        
+        // Создаем цветной квадратик
+        const colorSquare = document.createElement('span');
+        colorSquare.className = 'color-square';
+        colorSquare.style.backgroundColor = colorScheme.accent;
+        
+        // Создаем текст сообщения
+        const textElement = document.createElement('span');
+        textElement.textContent = `Accent color changed to: `;
+        
+        // Создаем элемент с названием цвета
+        const colorName = document.createElement('span');
+        colorName.textContent = colorScheme.name;
+        colorName.style.color = colorScheme.accent;
+        
+        // Собираем все вместе
+        messageContainer.appendChild(colorSquare);
+        messageContainer.appendChild(textElement);
+        messageContainer.appendChild(colorName);
+        
+        output.appendChild(messageContainer);
+        autoScrollToBottom();
+      }
+
+      async function displayColorList() {
+        const header = document.createElement('div');
+        header.className = 'command-output';
+        header.textContent = 'Available colors:';
+        output.appendChild(header);
+        
+        for (let i = 0; i < colorSchemes.length; i++) {
+          const scheme = colorSchemes[i];
+          const colorItem = document.createElement('div');
+          colorItem.className = 'color-item';
+          
+          // Создаем цветной квадратик
+          const colorSquare = document.createElement('span');
+          colorSquare.className = 'color-square';
+          colorSquare.style.backgroundColor = scheme.accent;
+          
+          // Создаем текст с названием цвета
+          const colorText = document.createElement('span');
+          colorText.className = 'color-name';
+          colorText.style.color = scheme.accent;
+          colorText.textContent = `${scheme.name}${i === currentColorIndex ? ' (current)' : ''}`;
+          
+          // Добавляем квадратик перед текстом
+          colorText.insertBefore(colorSquare, colorText.firstChild);
+          
+          colorItem.appendChild(colorText);
+          output.appendChild(colorItem);
+          
+          if (i < colorSchemes.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 30));
+          }
+          autoScrollToBottom();
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const footer = document.createElement('div');
+        footer.className = 'command-output';
+        footer.style.color = 'var(--muted)';
+        footer.textContent = 'Use !changecolor to cycle through colors';
+        output.appendChild(footer);
+        
+        autoScrollToBottom();
+      }
+
+      function clearTerminal() {
+        while (output.firstChild) {
+          output.removeChild(output.firstChild);
+        }
+        displayStartupArt();
+      }
+
+      async function activateKonami() {
+        body.classList.add('konami-flash');
+        setTimeout(() => {
+          body.classList.remove('konami-flash');
+        }, 2000);
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const messageLine = document.createElement('div');
+        messageLine.className = 'command-output';
+        messageLine.textContent = 'what were you expecting?';
+        messageLine.style.color = 'var(--accent)';
+        output.appendChild(messageLine);
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        const hintLine = document.createElement('div');
+        hintLine.className = 'command-output';
+        hintLine.textContent = '...something activated';
+        hintLine.style.color = 'var(--muted)';
+        output.appendChild(hintLine);
+        
+        autoScrollToBottom();
+      }
+
+      function switchTheme(theme) {
+        if (theme === 'dark') {
+          document.documentElement.classList.remove('light-theme');
+          document.documentElement.style.setProperty('--ascii-color', '#ffffff');
+          localStorage.setItem('thwakk-theme', 'dark');
+          return 'dark';
+        } else if (theme === 'light') {
+          document.documentElement.classList.add('light-theme');
+          document.documentElement.style.setProperty('--ascii-color', '#000000');
+          localStorage.setItem('thwakk-theme', 'light');
+          return 'light';
+        }
+        return null;
+      }
+
+      async function handleThemeCommand(args) {
+        if (args.length === 1) {
+          const theme = args[0].toLowerCase();
+          if (theme === 'dark' || theme === 'light') {
+            const newTheme = switchTheme(theme);
+            await typeLines([`Theme switched to ${newTheme} mode`]);
+          } else {
+            await typeLines(['Invalid theme. Use: !theme dark or !theme light']);
+          }
+        } else {
+          const currentTheme = document.documentElement.classList.contains('light-theme') ? 'light' : 'dark';
+          await typeLines([`Current theme: ${currentTheme}`, 'Usage: !theme dark or !theme light']);
+        }
+      }
+
+      // Автодополнение команд по Tab
+      let lastTabPress = 0;
+      let tabCompletionIndex = 0;
+      let currentCompletions = [];
+      
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          
+          const now = Date.now();
+          const value = input.value.trim();
+          
+          if (now - lastTabPress > 1000) {
+            tabCompletionIndex = 0;
+            currentCompletions = [];
+          }
+          
+          lastTabPress = now;
+          
+          if (currentCompletions.length === 0) {
+            currentCompletions = Object.keys(commands).filter(cmd => 
+              cmd.toLowerCase().startsWith(value.toLowerCase())
+            );
+          }
+          
+          if (currentCompletions.length > 0) {
+            const completion = currentCompletions[tabCompletionIndex];
+            input.value = completion;
+            tabCompletionIndex = (tabCompletionIndex + 1) % currentCompletions.length;
+          }
+        } else if (e.key !== 'Shift') {
+          tabCompletionIndex = 0;
+          currentCompletions = [];
+        }
+      });
+
+      // Обработчик нажатия клавиш для кода Konami
+      document.addEventListener('keydown', (e) => {
+        if (document.activeElement === input) {
+          if (e.code !== 'KeyB' && e.code !== 'KeyA') {
+            return;
+          }
+        }
+        
+        konamiSequence.push(e.code);
+        
+        if (konamiSequence.length > konamiCode.length) {
+          konamiSequence.shift();
+        }
+        
+        if (konamiSequence.length === konamiCode.length) {
+          let isKonami = true;
+          for (let i = 0; i < konamiCode.length; i++) {
+            if (konamiSequence[i] !== konamiCode[i]) {
+              isKonami = false;
+              break;
+            }
+          }
+          
+          if (isKonami) {
+            const konamiEcho = document.createElement('div');
+            konamiEcho.className = 'command-echo';
+            konamiEcho.innerHTML = `<span style="color:var(--accent)">$</span> `;
+            
+            konamiSymbols.forEach((symbol, index) => {
+              const span = document.createElement('span');
+              span.textContent = symbol;
+              span.className = 'konami-key';
+              span.style.animationDelay = `${index * 50}ms`;
+              konamiEcho.appendChild(span);
+              
+              if (index < konamiSymbols.length - 1) {
+                konamiEcho.appendChild(document.createTextNode(''));
+              }
+            });
+            
+            output.appendChild(konamiEcho);
+            activateKonami();
+            konamiSequence = [];
+            autoScrollToBottom();
+          }
+        }
+      });
+
+      input.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter') {
+          const value = input.value.trim();
+          if (!value) return;
+          
+          input.value = '';
+          addCommandEcho(value);
+          
+          if (value.startsWith('!theme')) {
+            const args = value.split(' ').slice(1);
+            await handleThemeCommand(args);
+          }
+          else if (value === '!changecolor') {
+            const newColor = changeAccentColor();
+            await showColorChangeMessage(newColor);
+          } 
+          else if (value === '!colors') {
+            await displayColorList();
+          }
+          else if (value === '!clear') {
+            clearTerminal();
+            const clearedMsg = document.createElement('div');
+            clearedMsg.className = 'command-output';
+            clearedMsg.textContent = 'Terminal cleared.';
+            output.appendChild(clearedMsg);
+            autoScrollToBottom();
+          }
+          else if (value === '!konami') {
+            await typeLines(commands['!konami']);
+          }
+          else if (commands[value]) {
+            await typeLines(commands[value]);
+          } else {
+            await typeLines(['command not found']);
+          }
+        }
+      });
+
+      // Auto-focus on input
+      input.focus();
+      
+      // Проверяем, есть ли сохраненная тема в localStorage
+      const savedTheme = localStorage.getItem('thwakk-theme');
+      if (savedTheme === 'light') {
+        switchTheme('light');
+      } else {
+        document.documentElement.style.setProperty('--ascii-color', 
+          document.documentElement.classList.contains('light-theme') ? '#000000' : '#ffffff'
+        );
+      }
+      
+      // Загружаем сохраненный цвет
+      loadSavedColor();
+      
+      // Обработчик изменения размера окна
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const artElement = document.querySelector('.ascii-art');
+          if (artElement) {
+            artElement.textContent = getAsciiArt();
+          }
+        }, 250);
+      });
+      
+      // Запускаем анимацию заголовка и отображение арта
+      setTimeout(() => {
+        typeHeader();
+        displayStartupArt();
+      }, 300);
+    });
+  </script>
 </body>
 </html>
